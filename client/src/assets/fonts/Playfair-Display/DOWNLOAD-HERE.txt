@@ -1,0 +1,23 @@
+PLAYFAIR DISPLAY FONT FAMILY
+
+Download from Google Fonts:
+https://fonts.google.com/specimen/Playfair+Display
+
+REQUIRED STYLES (3 files):
+1. PlayfairDisplay-Regular.ttf (400)
+2. PlayfairDisplay-Bold.ttf (700)
+3. PlayfairDisplay-Italic.ttf (400 italic)
+
+DOWNLOAD STEPS:
+1. Visit the link above
+2. Click "Download family" button
+3. Extract the ZIP file
+4. Copy these 3 .ttf files to this folder
+5. Use in your CSS with @font-face
+
+NOTE: Fonts are OPTIONAL
+The project already uses Google Fonts CDN.
+Only download if you want offline/local fonts.
+
+Usage: Main heading "FASHIONVERSE" text
+License: SIL Open Font License (Free for commercial use)

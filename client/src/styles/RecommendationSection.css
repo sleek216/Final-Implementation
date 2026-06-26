@@ -1,0 +1,8 @@
+/* Recommendation Section - Matches New Arrivals */
+.rec-section {
+    background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%) !important;
+}
+
+.rec-scroll-row::-webkit-scrollbar {
+    display: none;
+}

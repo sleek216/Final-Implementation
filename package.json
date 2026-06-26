@@ -1,0 +1,32 @@
+{
+  "name": "fashionverse",
+  "version": "1.0.0",
+  "description": "FashionVerse - Full Stack Fashion E-commerce Application",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "nodemon --config server/nodemon.json server/server.js",
+    "client": "npm --prefix client run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm --prefix client run build",
+    "install-all": "npm install && npm --prefix client install"
+  },
+  "keywords": [
+    "fashion",
+    "ecommerce",
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.11"
+  },
+  "dependencies": {
+    "torch": "^0.2.7"
+  }
+}

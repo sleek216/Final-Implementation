@@ -1,0 +1,328 @@
+/* =========================
+   ULTRA DESIGN SYSTEM
+========================= */
+:root {
+  --u-bg-gradient: radial-gradient(circle at 10% 20%, rgb(242, 246, 252) 0%, rgb(231, 237, 247) 90%);
+  --u-card-bg: rgba(255, 255, 255, 0.65);
+  --u-card-border: rgba(255, 255, 255, 0.9);
+  --u-shadow: 0 10px 40px -10px rgba(0, 60, 150, 0.1);
+  --u-shadow-hover: 0 20px 50px -10px rgba(0, 60, 150, 0.2);
+  --u-accent: #6366f1;
+  /* Indigo */
+  --u-accent-glow: #818cf8;
+  --u-dark: #0f172a;
+  --u-transition: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* SECTION LAYOUT */
+.ultra-brand-section {
+  position: relative;
+  width: 100%;
+  padding: 80px 0;
+  background: var(--u-bg-gradient);
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Background ambient glow effect */
+.background-blobs {
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background-image:
+    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.ultra-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--u-dark);
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.ultra-title .highlight {
+  background: linear-gradient(120deg, var(--u-accent), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 1rem;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* CONTAINER & NAVIGATION */
+.brand-wrapper {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  z-index: 2;
+}
+
+.brand-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 10px 40px 10px;
+  /* Bottom padding for hover expansion */
+  width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.brand-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid white;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  color: var(--u-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s var(--u-transition);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.nav-btn:hover {
+  background: var(--u-dark);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.nav-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* CARD DESIGN */
+.brand-card-container {
+  flex: 0 0 auto;
+  perspective: 1000px;
+}
+
+.brand-card {
+  display: block;
+  text-decoration: none;
+  width: 180px;
+  height: 220px;
+  position: relative;
+  border-radius: 24px;
+  /* Glassmorphism Base */
+  background: var(--u-card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--u-card-border);
+  box-shadow: var(--u-shadow);
+  transition: all 0.4s var(--u-transition);
+  overflow: hidden;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* HOVER EFFECTS */
+.brand-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--u-shadow-hover);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+/* IMAGE */
+.image-area {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s var(--u-transition);
+}
+
+.image-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+}
+
+.brand-card:hover .image-area {
+  transform: translateY(-40px) scale(0.9);
+}
+
+/* BRAND NAME LABEL */
+.brand-info {
+  position: absolute;
+  bottom: 24px;
+  transition: opacity 0.3s, transform 0.4s var(--u-transition);
+}
+
+.brand-name {
+  color: var(--u-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.brand-card:hover .brand-info {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* ULTRA OVERLAY (SLIDE UP) */
+.ultra-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  padding: 20px 16px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 20%, rgba(255, 255, 255, 0));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateY(110%);
+  /* Hidden by default */
+  transition: transform 0.4s var(--u-transition);
+}
+
+.brand-card:hover .ultra-overlay {
+  transform: translateY(0);
+}
+
+/* BUTTONS */
+.action-btn {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.action-btn.glass {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--u-dark);
+}
+
+.action-btn.glass:hover {
+  background: white;
+}
+
+.action-btn.neon {
+  background: var(--u-dark);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn.neon:hover {
+  background: var(--u-accent);
+  box-shadow: 0 4px 20px var(--u-accent-glow);
+}
+
+/* SCROLL BUTTONS */
+.scroll-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--u-dark);
+  font-size: 24px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s var(--u-transition);
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.scroll-btn:hover {
+  background: var(--u-dark);
+  color: white;
+  border-color: var(--u-dark);
+  transform: scale(1.12);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.scroll-btn:active {
+  transform: scale(0.96);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-btn {
+    display: none;
+    /* Hide arrows on touch devices */
+  }
+
+  .scroll-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .brand-track {
+    padding-left: 24px;
+    /* Peeking card effect */
+    padding-right: 24px;
+    gap: 16px;
+  }
+
+  .brand-card {
+    width: 150px;
+    height: 190px;
+  }
+
+  .ultra-title {
+    font-size: 1.8rem;
+  }
+
+  /* On mobile, sometimes hover is tricky. 
+     Optional: Make overlay always visible or keep tap behavior.
+     Here we keep the animation but ensure touch works. */
+}

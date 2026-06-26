@@ -1,0 +1,54 @@
+IMAGES REQUIRED FOR HOME PAGE
+===============================
+
+HERO SECTION IMAGE:
+-------------------
+Filename: hero-fashion-model.jpg
+URL: https://lh3.googleusercontent.com/aida-public/AB6AXuClHqBrCfUFYY2iZG3EeaC6ALaaRb5kGdJkyYAh6QxlRC3Diap-4gTxwCNCXXd5BvrgrHwcyIEduvdxEoUQnxdG02J4y5RWSlkKhOMCSPXmTRGtRE8SleAcWXXQH-l7LF_xGTRBqShskvw6I-y3PqG_6oamQ6lL2KYKG-kPaWAUstSQ8v3xJMuA2gtFPWF4Ok9tpqe2UlOt-quqokIBJWOAdoCHSV6tslJ1wl3ytB9lWMYtfrj1BGDV8vUxX8lXEhfLQwa9SjnmbdQ
+Description: Monochromatic fashion model runway shot with dramatic lighting
+
+PRODUCT IMAGES:
+---------------
+
+1. Product 1 - Oversized Wool Coat
+   Filename: product-1-wool-coat.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuBU0sOY-uA5KPQPxyTX-3lKQYQ0uqNbEfP1XhmXM6z2MlCaSiQCNZpqkMfdvaMe27nIzwLQp_2V_Rmv0ASGzfIoF_W-j3WbUy-0IsEJ87ycBlNL5mrjchSVpTkjqMmcHu5rNWCqufo-TcbAS7Bjl64Ggx885Y3z-0tk1F5faD-0pDA02GpIGx0CmzWlVDNvsOAJySvIZaVMD_nPUt-rwaOAPjX_h69dEwsqYzNEZ1B5wkxzLUxk7-JdfREva5Z1h4Wf3D01Rw0xIqU
+   Description: Oversized wool coat in charcoal grey studio shot
+
+2. Product 2 - Asymmetric Silk Dress
+   Filename: product-2-silk-dress.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuDt8QIo-G45SmgBhGNLiAQIMRvfYF-1Ih9lITs2RLKcTKhy9fa_Wd1_sYBq2Vn9k-l0tkV5-wgfcqkKqo22HMM0i3hifD5VOgo2qtKj-OkRct6sfa_6PXFjeeB-mMfagGxGd3nDC74p4X7LTs4ZXi9AOpMNiXyJKl1UirMQrCY7ZHZ3jx3irboOPwUfo1U7FA_voayH34guqj4BIf5gQmlYt0bM_Gj6_ZVnhmGwxtdH3vxv6tdRHe7dmES0_p3yDze8FSrfMarsKDc
+   Description: Asymmetric silk dress in cream white abstract fashion shot
+
+3. Product 3 - Structured Leather Tote
+   Filename: product-3-leather-tote.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuCu3TYFdfy5RWyhnGUHfv7zx262TUksHl41U2cK6fdcOL4Y0r2yt2hfRs2--naJTBhtOg8T3mvS8RUJ2af7iyzMYExJQuBwAoPlkbNGAkGCfmmqUKwZQ3yr1exPNhlQYfZ_MlutmcovZBYaRIIsa1nc1_OCpHxO9R4zNtRCv_ofurLD4ZJV3tCsz4uYv0vpfjldUArxLj8XdIpV7Uyl1V194WgeD2FIkLnUPaBD9rFEiGevdVzrbj_4YymoTRnM3_ezNFVcuCcnKgA
+   Description: Structured black leather tote bag on minimal background
+
+4. Product 4 - Tech-Nylon Puffer
+   Filename: product-4-puffer-jacket.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuA0-3gZ7UKDhSsdGM184IDTBam8li_omEs534rKoSIQaFZmY2lE92I1X75OqXc8QwzvQ1Bryk-FN-5EYrfM18V_9F49YmMZTk8zuCffWGxHqqRfq_xpa97exqfGDTlWUOfLuBp6DKmfMGytkB8ga680TZCWCRgwUoh4pC2vPEt4N9FYVrMLetaNjJCdDCZG8-sDMqHEgekAv9TmHL3C71zHcMbApgpACswq1OTtNWS_EwZLRK3BIRXqcEXY2Yt5YXKIRzDFDdSMCG0
+   Description: Futuristic silver puffer jacket minimal studio shot
+
+5. Product 5 - Combat Boots
+   Filename: product-5-combat-boots.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuAFbN4dM0Bznj_mXV8T2LeQVkutFtty-NFmy1nGKgv8wjEy_QvxNlpOwVsCnBCBFEmIB367jdO34ppba3FF-tzsORU6l1dFVtHifDzJkIGgkV-Mb7ar4_7GsOPb5FL4F6lbqkqYLL_hurir4Q5fu5X8_lt1qUcQIyREePMngTIFLtt3D8DJEPxHONTI1DT_Gd0XgaV3Vlor3IsUW8eGLMfzENBEnSRBAI1LjvjyEQdgBe5zUmbs7DyeEbJb4MPIeGUs_jSs2YWafj0
+   Description: Minimalist black boots fashion photography
+
+6. Product 6 - Layered Tunic
+   Filename: product-6-layered-tunic.jpg
+   URL: https://lh3.googleusercontent.com/aida-public/AB6AXuApvBiz8BldWrQFaOwIErASSDi9cGm6Byhh1CdzyZ6LkZzQzXMlHY80Vz_UZ_oS4daxxdwlPVm3xrvhY8yH7PjvI_mr-edxseM3mHACodzQD5o4dWbjcZp_c4nZ6tXDlnWzz5dreHuR_odfH7NYyEaCAwg3yt0-ITSaHAdhK8s_lKzEu8Ux-Ti8MiLkZz3OOep3-7kDNYw_xRFePxdR404ajxKoTXmfr9xScGf-IlpBW89yE7Obo1D0LF5Y5LF2DcqHlQ1WUIld1sU
+   Description: Avant garde layered tunic outfit grey
+
+HOW TO DOWNLOAD:
+----------------
+1. Copy each URL above
+2. Paste in browser
+3. Right-click image and "Save As..."
+4. Save with the filename specified
+5. Place in the images/ folder
+
+ALTERNATIVE METHOD:
+-------------------
+Use PowerShell to download all images:
+Invoke-WebRequest -Uri "[URL]" -OutFile "images/[filename]"

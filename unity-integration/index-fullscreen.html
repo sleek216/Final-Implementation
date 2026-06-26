@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no" />
+    <title>Unity WebGL Player | FYP-Stores</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #1a1a1a;
+      }
+      #unity-container {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+      #unity-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+        background: #1a1a1a;
+      }
+      #unity-loading-bar {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+      }
+      #unity-progress-bar-empty {
+        width: 240px;
+        height: 18px;
+        margin-top: 10px;
+        background: #333;
+        border-radius: 9px;
+      }
+      #unity-progress-bar-full {
+        width: 0%;
+        height: 18px;
+        background: #0ea5e9;
+        border-radius: 9px;
+      }
+      #unity-footer { display: none; }
+    </style>
+    <script src="TemplateData/webgl-bridge.js"></script>
+  </head>
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/Unity-Build.loader.js";
+
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function () {
+        createUnityInstance(
+          canvas,
+          {
+            dataUrl: buildUrl + "/Unity-Build.data",
+            frameworkUrl: buildUrl + "/Unity-Build.framework.js",
+            codeUrl: buildUrl + "/Unity-Build.wasm",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "FYP-Stores",
+            productVersion: "0.1",
+          },
+          function (progress) {
+            progressBarFull.style.width = 100 * progress + "%";
+          }
+        ).then(function (unityInstance) {
+          loadingBar.style.display = "none";
+          window.unityInstance = unityInstance;
+        }).catch(function (message) {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

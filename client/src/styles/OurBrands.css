@@ -1,0 +1,222 @@
+/* ===============================================
+   OUR BRANDS PAGE - Vertical Grid (3 per row)
+   Matches homepage brand card styling
+   =============================================== */
+
+.our-brands-loading {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}
+
+/* ---------- Section ---------- */
+.ourbrands-page-section {
+  padding: 72px 6% 80px;
+  background: #fdfbf7;
+  position: relative;
+  overflow: hidden;
+}
+
+.ourbrands-page-section::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(ellipse, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ---------- Header ---------- */
+.ourbrands-page-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.ourbrands-page-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #D4AF37;
+  margin-bottom: 12px;
+}
+
+.ourbrands-page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  position: relative;
+  letter-spacing: -0.5px;
+}
+
+.ourbrands-page-title::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+  margin: 14px auto 0;
+}
+
+/* ---------- Grid: 3 per row ---------- */
+.ourbrands-grid {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  padding: 0 10px;
+}
+
+/* ---------- Card Wrapper ---------- */
+.ourbrands-card-wrapper {
+  padding: 8px;
+}
+
+/* ---------- Card ---------- */
+.ourbrands-card {
+  height: 360px;
+  background: #faf5ef;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  cursor: pointer;
+}
+
+.ourbrands-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- Background Image ---------- */
+.ourbrands-card-bg {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.6s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #faf5ef;
+}
+
+.ourbrands-card:hover .ourbrands-card-bg {
+  transform: scale(1.08);
+}
+
+/* ---------- Fallback Initial ---------- */
+.ourbrands-card-initial {
+  font-size: 72px;
+  color: rgba(0, 0, 0, 0.10);
+  font-weight: 800;
+  user-select: none;
+}
+
+/* ---------- Overlay ---------- */
+.ourbrands-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  backdrop-filter: blur(4px);
+}
+
+.ourbrands-card:hover .ourbrands-card-overlay {
+  opacity: 1;
+}
+
+/* ---------- Card Info ---------- */
+.ourbrands-card-info {
+  margin-top: auto;
+  text-align: center;
+  transform: translateY(15px);
+  transition: transform 0.4s ease;
+}
+
+.ourbrands-card:hover .ourbrands-card-info {
+  transform: translateY(0);
+}
+
+.ourbrands-card-info h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ourbrands-card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ---------- Card Actions (2D / 3D buttons) ---------- */
+.ourbrands-card-actions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -20%) scale(0.8);
+  display: flex;
+  gap: 15px;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ourbrands-card:hover .ourbrands-card-actions {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .ourbrands-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .ourbrands-card {
+    height: 320px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ourbrands-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .ourbrands-card {
+    height: 300px;
+  }
+
+  .ourbrands-page-title {
+    font-size: 32px;
+  }
+
+  .ourbrands-page-section {
+    padding: 48px 4% 60px;
+  }
+}

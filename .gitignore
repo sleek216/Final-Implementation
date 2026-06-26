@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Build output
+client/dist/
+client/build/
+
+# Debug/log files
+debug.log
+*.log
+npm-debug.log*
+server/crash.txt
+server/crash_log.txt
+server/crash_log_utf8.txt
+server/crash_new.txt
+server/out.txt
+server/res2.txt
+server/debug_output.txt
+server/debug_brand_output.txt
+server/test_output.txt
+server/test_output_utf8.txt
+server/cloud_test_output.txt
+server/reserved_ports.txt
+server/test_port.txt
+server/test_port_v2.txt
+server/users_db_output.txt
+server/users_db_output_recent.txt
+server/users_list.txt
+
+# Python
+recommendation/__pycache__/
+recommendation/*.pyc
+recommendation/venv/
+recommendation/.venv/
+
+# Uploads
+server/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Unity builds (large files)
+client/public/unity/Build/**/*.data
+client/public/unity/Build/**/*.wasm
+client/public/unity/Build/*.data
+client/public/unity/Build/*.wasm
+client/public/unity/Build/*.js.gz
+client/public/unity/Build/*.data.gz
+client/public/unity/Build/*.wasm.gz
+
+# Large 3D model files (over 100MB)
+client/public/models/mall_model.glb
+client/public/models/mall/mall_model.glb
+*.glb
+
+# Zip files
+*.zip
+
+# Old Python venvs
+recommendation/venv_old/
+recommendation/venv/
+recommendation/.venv/

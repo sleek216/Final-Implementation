@@ -1,0 +1,549 @@
+/* =====================================================
+   COMPARISON PRODUCT PAGE – PREMIUM CSS
+===================================================== */
+
+.comparison-page-wrapper {
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+.comparison-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 4%;
+}
+
+.comparison-header {
+    margin-bottom: 40px;
+}
+
+.comparison-header h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.comparison-header p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* =========================
+   COMPARISON GRID
+========================= */
+
+.comparison-grid-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 60px;
+    overflow: hidden;
+}
+
+.comparison-slots-wrapper {
+    display: grid;
+    grid-template-columns: 280px repeat(3, 1fr);
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.comparison-info-column {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid #f1f5f9;
+}
+
+.comparison-info-column h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 28px;
+    line-height: 1.3;
+    color: #1e293b;
+}
+
+.comparison-slot {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-right: 1px solid #f1f5f9;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.comparison-slot:last-child {
+    border-right: none;
+}
+
+.remove-slot-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f1f5f9;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.remove-slot-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.prod-compare-img {
+    width: 160px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.prod-compare-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+    height: 44px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.prod-compare-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 15px;
+}
+
+.discount-badge {
+    background: #ecfdf5;
+    color: #10b981;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+.add-bag-compare-btn {
+    background: #f97316;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-bag-compare-btn:hover {
+    background: #ea580c;
+    transform: translateY(-2px);
+}
+
+/* EMPTY SLOT */
+.empty-compare-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px 20px;
+}
+
+.empty-compare-slot p {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.empty-compare-slot span {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+.add-compare-box {
+    width: 100%;
+    max-width: 200px;
+    height: 100px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.add-compare-box:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+/* =========================
+   FEATURES TABLE
+========================= */
+
+.features-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.features-section-header td {
+    background: #f8fafc;
+    padding: 12px 40px;
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.features-table tr td {
+    padding: 20px 40px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #475569;
+}
+
+.feature-label {
+    font-weight: 600;
+    color: #1e293b;
+    width: 280px;
+}
+
+.features-table tr td:not(.feature-label) {
+    text-align: center;
+}
+
+/* =========================
+   MODAL / SELECTION
+========================= */
+
+.brand-catalog-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    max-height: 80vh;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    color: #1e293b;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.modal-body {
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.brands-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.brand-select-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.brand-select-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.brand-logo-mini {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.brand-select-card h4 {
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.products-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.prod-select-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.prod-select-card:hover {
+    border-color: #3b82f6;
+}
+
+.prod-img-mini {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.prod-select-card h4 {
+    font-size: 13px;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.prod-select-card p {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* =========================
+   RECENT & POPULAR
+========================= */
+
+.comparison-extras {
+    margin-top: 80px;
+}
+
+.extras-section {
+    margin-bottom: 60px;
+}
+
+.extras-section h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: #1e293b;
+}
+
+.popular-comparing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.popular-compare-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s;
+}
+
+.popular-compare-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.vs-img-pair {
+    display: flex;
+    align-items: center;
+}
+
+.vs-img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #f8fafc;
+}
+
+.vs-divider {
+    padding: 0 15px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3b82f6;
+}
+
+.vs-info {
+    flex: 1;
+}
+
+.vs-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.vs-price {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.recent-comparing-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.recent-compare-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    border: 1px solid #f1f5f9;
+}
+
+.recent-prod-pair {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.recent-prod-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.recent-img {
+    width: 50px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.recent-info-mini {
+    width: 120px;
+}
+
+.recent-name {
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-vs {
+    font-size: 12px;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+    .comparison-slots-wrapper {
+        grid-template-columns: 200px repeat(3, 1fr);
+    }
+
+    .feature-label {
+        width: 200px;
+    }
+
+    .popular-comparing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .comparison-slots-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-info-column {
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .comparison-slot {
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .feature-label {
+        width: 100%;
+        display: block;
+        background: #f8fafc;
+    }
+
+    .features-table tr {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .features-table td:not(.feature-label) {
+        width: 100%;
+        text-align: left !important;
+    }
+
+    .recent-comparing-list {
+        grid-template-columns: 1fr;
+    }
+
+    .popular-comparing-grid {
+        grid-template-columns: 1fr;
+    }
+}

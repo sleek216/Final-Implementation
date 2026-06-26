@@ -1,0 +1,151 @@
+.unity-mall-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+}
+
+.unity-mall-page--modal-open .unity-mall-canvas-wrap {
+  pointer-events: none;
+}
+
+.unity-mall-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1.25rem;
+  background: rgba(15, 23, 42, 0.92);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.unity-mall-back,
+.unity-mall-alt {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.unity-mall-back:hover,
+.unity-mall-alt:hover {
+  color: #f8fafc;
+}
+
+.unity-mall-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: 0.04em;
+}
+
+.unity-mall-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.unity-mall-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #111827;
+}
+
+.unity-mall-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(15, 23, 42, 0.88);
+  color: #e2e8f0;
+  padding: 2rem;
+  text-align: center;
+  z-index: 5;
+}
+
+.unity-mall-overlay--error {
+  overflow-y: auto;
+}
+
+.unity-mall-overlay__title {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.unity-mall-progress {
+  width: min(320px, 80vw);
+  height: 8px;
+  background: #334155;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.unity-mall-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  transition: width 0.2s ease;
+}
+
+.unity-mall-steps {
+  text-align: left;
+  max-width: 520px;
+  margin: 1rem auto 0;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.unity-mall-steps code {
+  background: #1e293b;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.unity-mall-hud {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 4;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  pointer-events: none;
+}
+
+.unity-mall-hud kbd {
+  background: #334155;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.75rem;
+}
+
+.unity-mall-fetching {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 6;
+  background: rgba(14, 165, 233, 0.9);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.unity-mall-page .product-3d-overlay {
+  z-index: 10000;
+}

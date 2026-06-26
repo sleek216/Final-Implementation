@@ -1,0 +1,26 @@
+MANROPE FONT FAMILY
+
+Download from Google Fonts:
+https://fonts.google.com/specimen/Manrope
+
+REQUIRED WEIGHTS (7 files):
+1. Manrope-ExtraLight.ttf (200)
+2. Manrope-Light.ttf (300)
+3. Manrope-Regular.ttf (400)
+4. Manrope-Medium.ttf (500)
+5. Manrope-SemiBold.ttf (600)
+6. Manrope-Bold.ttf (700)
+7. Manrope-ExtraBold.ttf (800)
+
+DOWNLOAD STEPS:
+1. Visit the link above
+2. Click "Download family" button
+3. Extract the ZIP file
+4. Copy all .ttf files to this folder
+5. Use in your CSS with @font-face
+
+NOTE: Fonts are OPTIONAL
+The project already uses Google Fonts CDN.
+Only download if you want offline/local fonts.
+
+License: SIL Open Font License (Free for commercial use)

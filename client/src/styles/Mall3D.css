@@ -1,0 +1,465 @@
+.mall3d-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+.mall3d-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.mall3d-back-link {
+  color: #111827;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mall3d-back-link:hover {
+  color: #4b5563;
+}
+
+.mall3d-page-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #d97706;
+}
+
+.mall3d-alt-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mall3d-alt-link:hover {
+  color: #1d4ed8;
+}
+
+.mall3d-cesium-host .cesium-viewer,
+.mall3d-cesium-host .cesium-widget,
+.mall3d-cesium-host .cesium-widget canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.mall3d-experience {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.mall3d-canvas-host {
+  width: 100%;
+  height: 100%;
+}
+
+.mall3d-canvas-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mall3d-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 2;
+}
+
+.mall3d-overlay--loading,
+.mall3d-overlay--error {
+  flex-direction: column;
+  color: #fff;
+  text-align: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.mall3d-overlay--loading span {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.mall3d-load-tip {
+  max-width: 420px;
+  line-height: 1.5;
+  padding: 0 16px;
+}
+
+.mall3d-progress-track {
+  width: min(320px, 80vw);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.mall3d-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  transition: width 0.25s ease;
+}
+
+.mall3d-overlay--prompt {
+  cursor: pointer;
+}
+
+.mall3d-page--playing .mall3d-page-header {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-100%);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.mall3d-experience--playing {
+  cursor: none;
+}
+
+.mall3d-overlay--loading {
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.98));
+}
+
+.mall3d-game-loader {
+  width: min(420px, 90vw);
+  text-align: center;
+}
+
+.mall3d-game-loader__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #fbbf24;
+}
+
+.mall3d-game-loader__status {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #94a3b8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.mall3d-game-loader__pct {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.mall3d-overlay--prompt {
+  cursor: pointer;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.mall3d-pause-menu {
+  width: min(400px, 92%);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  color: #fff;
+}
+
+.mall3d-pause-menu__tag {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #fbbf24;
+}
+
+.mall3d-pause-menu h2 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.mall3d-pause-menu p {
+  margin: 0 0 20px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.mall3d-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.mall3d-controls-grid div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.mall3d-controls-grid kbd {
+  display: inline-block;
+  min-width: 52px;
+  padding: 4px 8px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f8fafc;
+  text-align: center;
+}
+
+.mall3d-start-btn--game {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  border-radius: 8px;
+}
+
+.mall3d-start-btn--game:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.mall3d-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.mall3d-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mall3d-crosshair span {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.mall3d-crosshair span:first-child {
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.mall3d-crosshair span:last-child {
+  left: 50%;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  transform: translateX(-50%);
+}
+
+.mall3d-hud--game {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+}
+
+.mall3d-hud__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mall3d-hud__brand {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mall3d-hud__sprint {
+  padding: 4px 10px;
+  background: rgba(251, 191, 36, 0.9);
+  color: #111827;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  animation: mall3d-sprint-pulse 0.6s ease infinite alternate;
+}
+
+.mall3d-hud__store {
+  padding: 4px 10px;
+  background: rgba(34, 197, 94, 0.9);
+  color: #052e16;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  animation: mall3d-store-in 0.35s ease;
+}
+
+@keyframes mall3d-store-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mall3d-sprint-pulse {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+
+.mall3d-hud__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.mall3d-hud__keys span {
+  background: transparent;
+  padding: 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mall3d-hud__keys kbd {
+  display: inline-block;
+  min-width: 22px;
+  margin-right: 3px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.mall3d-prompt-card {
+  width: min(420px, 92%);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.mall3d-prompt-card h2 {
+  margin: 0 0 10px;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  color: #111827;
+}
+
+.mall3d-prompt-card p {
+  margin: 0 0 14px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.mall3d-prompt-card--compact {
+  width: min(340px, 92%);
+  padding: 22px 20px;
+}
+
+.mall3d-warning {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.mall3d-prompt-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  text-align: left;
+  font-size: 13px;
+  color: #374151;
+}
+
+.mall3d-prompt-card li {
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mall3d-start-btn {
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+  border-radius: 6px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mall3d-start-btn:hover {
+  background: #333;
+}
+
+.mall3d-hud {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mall3d-hud span {
+  background: rgba(17, 24, 39, 0.72);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
