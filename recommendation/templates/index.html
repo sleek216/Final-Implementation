@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', _v=0.1) }}">
+    <title>E-commerce Recommendations</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>E-Commerce Recommendations</h1>
+        <form action="/recommend" method="post">
+            <input type="text" name="user_id" placeholder="User ID" required>
+            <select name="algorithm" class="form-select">
+                <option value="collaborative">Collaborative Filtering</option>
+                <option value="content-based">Content-Based</option>
+                <option value="hybrid">Hybrid Approach</option>
+            </select>
+            <button type="submit">Get Recommendations</button>
+        </form>
+        <h2>Available Products</h2>
+        <ul>
+            {% for product in products %}
+            <li>{{ product.product_name }} - ${{ product.price }} (Rating: {{ product.rating }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>
