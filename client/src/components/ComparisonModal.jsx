@@ -14,6 +14,7 @@ const ComparisonModal = ({ mainProduct, onClose }) => {
     const [brandProductsMap, setBrandProductsMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [modalMode, setModalMode] = useState("brands"); // "brands" or "products"
+    const [carouselIndices, setCarouselIndices] = useState({});
 
     useEffect(() => {
         if (mainProduct?._id) {
@@ -97,6 +98,20 @@ const ComparisonModal = ({ mainProduct, onClose }) => {
     const navigateToBrand = (brandId) => {
         onClose();
         navigate(`/brand/${brandId}`);
+    };
+
+    const handleNextProduct = (brandId, total) => {
+        setCarouselIndices(prev => ({
+            ...prev,
+            [brandId]: ((prev[brandId] || 0) + 1) % total
+        }));
+    };
+
+    const handlePrevProduct = (brandId, total) => {
+        setCarouselIndices(prev => ({
+            ...prev,
+            [brandId]: ((prev[brandId] || 0) - 1 + total) % total
+        }));
     };
 
     return (
@@ -202,16 +217,19 @@ const ComparisonModal = ({ mainProduct, onClose }) => {
                                     </div>
                                 </div>
 
-                                {/* RIGHT: MATCHING PRODUCTS (SCROLLABLE) */}
+                                {/* RIGHT: MATCHING PRODUCTS (SCROLLABLE COLUMNS) */}
                                 <div className="matching-products-column">
-                                    <div className="brands-rows-container">
+                                    <div className="brands-columns-container">
                                         {selectedBrandIds.map(brandId => {
                                             const brand = brands.find(b => b._id === brandId);
                                             const products = brandProductsMap[brandId] || [];
+                                            const activeIndex = carouselIndices[brandId] || 0;
+                                            const hasMultiple = products.length > 1;
+                                            const activeProduct = products[activeIndex];
                                             
                                             return (
-                                                <div key={brandId} className="brand-product-row">
-                                                    <div className="row-brand-profile">
+                                                <div key={brandId} className="brand-comparison-column">
+                                                    <div className="column-brand-profile">
                                                         <img 
                                                             src={brand.logo 
                                                                 ? (brand.logo.startsWith('http') ? brand.logo : `http://localhost:5005/uploads/${brand.logo}`)
@@ -219,39 +237,76 @@ const ComparisonModal = ({ mainProduct, onClose }) => {
                                                             } 
                                                             alt={brand.name} 
                                                         />
-                                                        <div className="brand-row-info">
+                                                        <div className="brand-column-info">
                                                             <h4>{brand.name}</h4>
-                                                            <span>{products.length} Items Match</span>
+                                                            <span className="match-badge">{products.length} Items Match</span>
                                                         </div>
                                                         <button className="view-brand-btn" onClick={() => navigateToBrand(brandId)}>Visit Store</button>
                                                     </div>
                                                     
-                                                    <div className="row-products-scrollable">
-                                                        {products.length > 0 ? products.map(prod => (
-                                                            <div key={prod._id} className="comp-product-luxe-card">
-                                                                <div className="luxe-card-media">
-                                                                    <img 
-                                                                        src={prod.images?.[0] 
-                                                                            ? (prod.images[0].startsWith('http') ? prod.images[0] : `http://localhost:5005/uploads/${prod.images[0]}`)
-                                                                            : (prod.image?.startsWith('http') ? prod.image : `http://localhost:5005/uploads/${prod.image}`)
-                                                                        } 
-                                                                        alt={prod.name} 
-                                                                        onError={(e) => { e.target.src = "https://via.placeholder.com/200x240?text=No+Image"; }}
-                                                                    />
-                                                                    <div className="luxe-hover-overlay">
-                                                                        <button className="overlay-btn view" onClick={() => {
-                                                                            onClose();
-                                                                            navigate(`/product/${prod.productId || prod._id}`, { state: { product: prod, fromComparison: true, mainProductId: mainProduct.productId || mainProduct._id } });
-                                                                        }}>View Details</button>
-                                                                        <button className="overlay-btn bag" onClick={() => handleAddToBag(prod)}>Add to Bag</button>
+                                                    <div className="column-products-carousel">
+                                                        {products.length > 0 ? (
+                                                            <div className="carousel-product-wrapper">
+                                                                {hasMultiple && (
+                                                                    <button 
+                                                                        className="carousel-arrow prev-arrow" 
+                                                                        onClick={() => handlePrevProduct(brandId, products.length)}
+                                                                        aria-label="Previous product"
+                                                                    >
+                                                                        ‹
+                                                                    </button>
+                                                                )}
+                                                                
+                                                                <div className="comp-product-luxe-card">
+                                                                    <div className="luxe-card-media">
+                                                                        <img 
+                                                                            src={activeProduct.images?.[0] 
+                                                                                ? (activeProduct.images[0].startsWith('http') ? activeProduct.images[0] : `http://localhost:5005/uploads/${activeProduct.images[0]}`)
+                                                                                : (activeProduct.image?.startsWith('http') ? activeProduct.image : `http://localhost:5005/uploads/${activeProduct.image}`)
+                                                                            } 
+                                                                            alt={activeProduct.name} 
+                                                                            onError={(e) => { e.target.src = "https://via.placeholder.com/200x240?text=No+Image"; }}
+                                                                        />
+                                                                        <div className="luxe-hover-overlay">
+                                                                            <button className="overlay-btn view" onClick={() => {
+                                                                                onClose();
+                                                                                navigate(`/product/${activeProduct.productId || activeProduct._id}`, { state: { product: activeProduct, fromComparison: true, mainProductId: mainProduct.productId || mainProduct._id } });
+                                                                            }}>View Details</button>
+                                                                            <button className="overlay-btn bag" onClick={() => handleAddToBag(activeProduct)}>Add to Bag</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="luxe-card-info">
+                                                                        <h5>{activeProduct.name}</h5>
+                                                                        <span className="luxe-price">Rs. {activeProduct.price?.toLocaleString()}</span>
                                                                     </div>
                                                                 </div>
-                                                                <div className="luxe-card-info">
-                                                                    <h5>{prod.name}</h5>
-                                                                    <span className="luxe-price">Rs. {prod.price?.toLocaleString()}</span>
-                                                                </div>
+
+                                                                {hasMultiple && (
+                                                                    <button 
+                                                                        className="carousel-arrow next-arrow" 
+                                                                        onClick={() => handleNextProduct(brandId, products.length)}
+                                                                        aria-label="Next product"
+                                                                    >
+                                                                        ›
+                                                                    </button>
+                                                                )}
+
+                                                                {hasMultiple && (
+                                                                    <div className="carousel-indicator-bar">
+                                                                        <div className="carousel-dots">
+                                                                            {products.map((_, idx) => (
+                                                                                <span 
+                                                                                    key={idx} 
+                                                                                    className={`dot ${idx === activeIndex ? 'active' : ''}`}
+                                                                                    onClick={() => setCarouselIndices(prev => ({ ...prev, [brandId]: idx }))}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                        <span className="carousel-count-text">{activeIndex + 1} of {products.length}</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        )) : (
+                                                        ) : (
                                                             <p className="no-row-items">No exact matches found for this brand in the same color.</p>
                                                         )}
                                                     </div>

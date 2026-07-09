@@ -1,5 +1,17 @@
 import Product from '../models/Product.js';
 import Brand from '../models/Brand.js';
+import axios from 'axios';
+
+// Helper to notify Python Flask recommendation service of data changes
+const triggerRecommendationRefresh = () => {
+  axios.post('http://127.0.0.1:5001/refresh-data')
+    .then(() => {
+      console.log('[Recommendation] Triggered recommendation data refresh successfully');
+    })
+    .catch((error) => {
+      console.error('[Recommendation] Failed to trigger recommendation refresh:', error.message);
+    });
+};
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -72,6 +84,7 @@ export const createProduct = async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
+    triggerRecommendationRefresh();
     res.status(201).json({ message: 'Product created successfully', product });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -89,6 +102,7 @@ export const updateProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    triggerRecommendationRefresh();
     res.json({ message: 'Product updated successfully', product });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -102,6 +116,7 @@ export const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    triggerRecommendationRefresh();
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

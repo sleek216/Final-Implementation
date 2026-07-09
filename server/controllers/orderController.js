@@ -1,6 +1,7 @@
 import Order from '../models/Order.js';
 import Brand from '../models/Brand.js';
 import Setting from '../models/Setting.js';
+import axios from 'axios';
 import Product from '../models/Product.js';
 import Stripe from 'stripe';
 import { sendOrderConfirmationEmail, sendNewOrderNotification } from '../utils/emailService.js';
@@ -280,6 +281,11 @@ export const verifyPayment = async (req, res) => {
           }
         }
       }
+
+      // Trigger recommendation engine data refresh
+      axios.post('http://127.0.0.1:5001/refresh-data')
+        .then(() => console.log('[Recommendation] Triggered data refresh successfully on purchase'))
+        .catch(err => console.error('[Recommendation] Failed to trigger data refresh on purchase:', err.message));
 
       return res.json({ success: true, order });
     } else {

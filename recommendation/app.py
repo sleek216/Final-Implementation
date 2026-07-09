@@ -1,40 +1,170 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 import pandas as pd
+from pymongo import MongoClient
+import os
+import logging
+from flask_cors import CORS
 from model import (
     collaborative_filtering, 
     content_based_filtering, 
     hybrid_recommendation
 )
-import logging
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
 app.secret_key = 'your-secret-key'
 logging.basicConfig(level=logging.DEBUG)
+# Suppress noisy debug logs from pymongo (connection checkins, heartbeats, etc.)
+logging.getLogger('pymongo').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-# Load data
-users = pd.read_csv('users_expanded.csv')
-products = pd.read_csv('products_expanded.csv')
-product_images = pd.read_csv('product_images_expanded.csv')
+# MongoDB Configuration
+MONGO_URI = os.environ.get("MONGODB_URI", "mongodb+srv://hyberistics7617_db_user:On7LrwaYWqMvugeN@cluster0.5od8xrz.mongodb.net/fashionverse")
+DB_NAME = 'fashionverse'
 
-# Merge images with products for easy access
-products = products.merge(product_images, on='product_id', how='left')
+# Global MongoClient cache for connection pooling
+mongo_client = None
 
-# Add compatibility fields for frontend components
-products['image'] = products['image_path']
-products['images'] = products['image_path'].apply(lambda x: [x] if pd.notnull(x) else [])
-products['name'] = products['product_name']
-products['_id'] = products['product_id']
+def get_mongo_client():
+    global mongo_client
+    if mongo_client is None:
+        mongo_client = MongoClient(MONGO_URI)
+    return mongo_client
 
+# Global In-Memory DataFrames
+users = None
+products = None
+purchases = None
+browsing_history = None
 
-purchases = pd.read_csv('purchases_expanded.csv')
-browsing_history = pd.read_csv('browsing_history_expanded.csv')
+def load_data_from_mongodb():
+    global users, products, purchases, browsing_history
+    logger.info("Connecting to MongoDB and loading data into memory...")
+    
+    try:
+        client = get_mongo_client()
+        db = client[DB_NAME]
+        
+        # 1. Load Users
+        users_list = list(db.users.find())
+        if users_list:
+            users_df = pd.DataFrame(users_list)
+            users_df.rename(columns={'_id': 'user_id'}, inplace=True)
+            users_df['user_id'] = users_df['user_id'].astype(str)
+            users = users_df[['user_id', 'name', 'email']].copy()
+        else:
+            users = pd.DataFrame(columns=['user_id', 'name', 'email'])
+        
+        # 2. Load Products
+        products_list = list(db.products.find())
+        if products_list:
+            products_df = pd.DataFrame(products_list)
+            products_df.rename(columns={'_id': 'product_id', 'name': 'product_name'}, inplace=True)
+            products_df['product_id'] = products_df['product_id'].astype(str)
+            
+            # Populate defaults and handle missing fields
+            if 'rating' not in products_df.columns:
+                products_df['rating'] = 4.0
+            products_df['rating'] = products_df['rating'].fillna(4.0)
+            
+            if 'brand' not in products_df.columns:
+                products_df['brand'] = ''
+            else:
+                products_df['brand'] = products_df['brand'].apply(lambda x: str(x) if pd.notnull(x) else '')
+                
+            if 'colors' not in products_df.columns:
+                products_df['colors'] = [[] for _ in range(len(products_df))]
+            else:
+                products_df['colors'] = products_df['colors'].apply(lambda x: x if isinstance(x, list) else [])
+                
+            if 'sizes' not in products_df.columns:
+                products_df['sizes'] = [[] for _ in range(len(products_df))]
+            else:
+                products_df['sizes'] = products_df['sizes'].apply(lambda x: x if isinstance(x, list) else [])
+                
+            if 'price' not in products_df.columns:
+                products_df['price'] = 0.0
+            products_df['price'] = products_df['price'].fillna(0.0)
+
+            # Extract the first image url for 'image_path' and ensure image lists
+            def get_first_image(imgs):
+                if isinstance(imgs, list) and len(imgs) > 0:
+                    return imgs[0]
+                return ''
+
+            if 'images' in products_df.columns:
+                products_df['image_path'] = products_df['images'].apply(get_first_image)
+                products_df['images'] = products_df['images'].apply(lambda x: x if isinstance(x, list) else [])
+            else:
+                products_df['images'] = [[] for _ in range(len(products_df))]
+                products_df['image_path'] = ''
+
+            # Add compatibilities
+            products_df['image'] = products_df['image_path']
+            products_df['name'] = products_df['product_name']
+            products_df['_id'] = products_df['product_id']
+
+            products = products_df.copy()
+        else:
+            products = pd.DataFrame(columns=['product_id', 'product_name', 'category', 'price', 'description', 'rating', 'colors', 'sizes', 'brand', 'image_path', 'image', 'images', '_id', 'name'])
+        
+        # 3. Load Purchases (Orders)
+        orders_list = list(db.orders.find())
+        purchases_list = []
+        if orders_list:
+            for order in orders_list:
+                user_id = order.get('user', order.get('userId', order.get('user_id', '')))
+                items = order.get('items', order.get('orderItems', []))
+                if isinstance(items, list):
+                    for item in items:
+                        product_id = item.get('product', item.get('productId', item.get('product_id', '')))
+                        purchases_list.append({
+                            'user_id': str(user_id),
+                            'product_id': str(product_id),
+                            'purchase_date': str(order.get('createdAt', '2024-01-01'))
+                        })
+        
+        purchases_df = pd.DataFrame(purchases_list)
+        if purchases_df.empty:
+            purchases = pd.DataFrame(columns=['user_id', 'product_id', 'purchase_date'])
+        else:
+            purchases_df['user_id'] = purchases_df['user_id'].astype(str)
+            purchases_df['product_id'] = purchases_df['product_id'].astype(str)
+            purchases = purchases_df
+
+        # 4. Generate Browsing History
+        browsing_list = []
+        if not users.empty and not products.empty:
+            for _, user_row in users.iterrows():
+                for _, prod_row in products.head(3).iterrows():
+                    browsing_list.append({
+                        'user_id': str(user_row['user_id']),
+                        'product_id': str(prod_row['product_id']),
+                        'browse_date': '2024-01-01'
+                    })
+        browsing_history = pd.DataFrame(browsing_list)
+        
+        # Connection is kept open in the global pool, do not close it
+        logger.info(f"Successfully loaded MongoDB dataset. Users: {len(users)}, Products: {len(products)}, Purchases: {len(purchases)}")
+    except Exception as err:
+        logger.error(f"Error connecting to MongoDB: {str(err)}")
+        raise err
+
+# Initial Load
+load_data_from_mongodb()
 
 @app.route('/')
 def index():
     return render_template('index.html', products=products.to_dict(orient='records'))
+
+@app.route('/refresh-data', methods=['POST'])
+def refresh_data():
+    try:
+        load_data_from_mongodb()
+        return jsonify({'success': True, 'message': 'Data refreshed successfully'})
+    except Exception as e:
+        logger.error(f"Error refreshing dataset: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/recommend', methods=['POST'])
 def get_recommendations():
@@ -43,6 +173,7 @@ def get_recommendations():
         user_id = str(user_id)
         algorithm = request.form['algorithm']
         logger.debug(f"Processing request for user_id: {user_id}, algorithm: {algorithm}")
+        
         users['user_id'] = users['user_id'].astype(str)
         purchases['user_id'] = purchases['user_id'].astype(str)
         browsing_history['user_id'] = browsing_history['user_id'].astype(str)
@@ -88,6 +219,36 @@ def get_recommendations():
         flash(f'An error occurred: {str(e)}')
         return redirect(url_for('index'))
 
+def safe_serialize_df(df_or_records):
+    """
+    Safely converts a pandas DataFrame to a list of dicts, and replaces
+    any float NaN/NaT values with Python None so that they are serialized
+    as JSON null (instead of invalid NaN tokens).
+    """
+    if isinstance(df_or_records, pd.DataFrame):
+        records = df_or_records.to_dict(orient='records')
+    else:
+        records = df_or_records
+
+    def is_nan_value(v):
+        if isinstance(v, (list, dict, set, tuple)):
+            return False
+        import numpy as np
+        if isinstance(v, np.ndarray):
+            return False
+        return pd.isna(v)
+
+    cleaned = []
+    for record in records:
+        cleaned_rec = {}
+        for k, v in record.items():
+            if is_nan_value(v):
+                cleaned_rec[k] = None
+            else:
+                cleaned_rec[k] = v
+        cleaned.append(cleaned_rec)
+    return cleaned
+
 # 1. Homepage: Trending / Personalized (Hybrid)
 @app.route('/api/recommendations/homepage', methods=['GET', 'POST'])
 def homepage_recs():
@@ -100,14 +261,12 @@ def homepage_recs():
     logger.debug(f"Homepage recs for user_id: {user_id}")
     recs = hybrid_recommendation(user_id, purchases, browsing_history, products)
     
-    # If the recommendations returned are entirely from the "Popular" fallback
-    # it means the user has no history. For logged in users, we return empty
-    # so the frontend doesn't show a fake "Just for You" section.
+    # For logged in users, if the recommendations are popular fallbacks, return empty so the frontend does not show a fake Just For You
     if user_id and user_id != 'guest':
         if not recs.empty and (recs['source'] == 'Popular').all():
             return jsonify({'success': True, 'recommendations': []})
             
-    return jsonify({'success': True, 'recommendations': recs.head(10).to_dict(orient='records')})
+    return jsonify({'success': True, 'recommendations': safe_serialize_df(recs.head(10))})
 
 # 2. Product Page (PDP): Content-Based Filtering
 @app.route('/api/recommendations/pdp', methods=['POST'])
@@ -128,7 +287,7 @@ def pdp_recs(product_id=None):
     recs['source'] = 'Content-Based Filtering'
     recs = recs.sort_values(by='score', ascending=False).head(6)
     
-    return jsonify({'success': True, 'recommendations': recs.to_dict(orient='records')})
+    return jsonify({'success': True, 'recommendations': safe_serialize_df(recs)})
 
 # 3. Cart Page: Hybrid Recommendation
 @app.route('/api/recommendations/cart', methods=['POST'])
@@ -137,7 +296,6 @@ def cart_recs():
     user_id = request.json.get('user_id')
     logger.debug(f"Cart Hybrid Recommendation for user_id: {user_id}, items: {cart_items}")
     
-    # Run hybrid recommendation for user (falls back to popular items for guest)
     if not user_id or user_id == 'guest':
         user_id = 'guest'
         
@@ -148,7 +306,7 @@ def cart_recs():
         recs = recs[~recs['product_id'].isin(cart_items)].copy()
         
     recs = recs.head(4)
-    return jsonify({'success': True, 'recommendations': recs.to_dict(orient='records')})
+    return jsonify({'success': True, 'recommendations': safe_serialize_df(recs)})
 
 # 4. Search Results & Category Page: Personalized ranking (Collaborative)
 @app.route('/api/recommendations/rank', methods=['POST'])
@@ -158,21 +316,21 @@ def personalized_ranking():
     
     pool = products[products['product_id'].isin(product_ids)].copy()
     if not user_id:
-        return jsonify({'success': True, 'recommendations': pool.to_dict(orient='records')})
+        return jsonify({'success': True, 'recommendations': safe_serialize_df(pool)})
         
     user_recs = collaborative_filtering(user_id, purchases, products)
     if not user_recs.empty:
         pool = pool.merge(user_recs[['product_id', 'score']], on='product_id', how='left').fillna(0)
         pool = pool.sort_values(by='score', ascending=False)
     
-    return jsonify({'success': True, 'recommendations': pool.to_dict(orient='records')})
+    return jsonify({'success': True, 'recommendations': safe_serialize_df(pool)})
 
 # 5. Order Confirm: Post-purchase suggest (Collaborative / Content)
 @app.route('/api/recommendations/post-purchase', methods=['GET'])
 def post_purchase_recs():
     user_id = request.args.get('user_id')
     recs = hybrid_recommendation(user_id, purchases, browsing_history, products)
-    return jsonify({'success': True, 'recommendations': recs.head(5).to_dict(orient='records')})
+    return jsonify({'success': True, 'recommendations': safe_serialize_df(recs.head(5))})
 
 if __name__ == '__main__':
     # Use gunicorn in production, debug mode locally

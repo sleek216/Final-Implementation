@@ -183,6 +183,7 @@ export class CartProvider extends Component {
           toggleCart: this.toggleCart,
           clearCart: this.clearCart,
           setBuyNowItem: this.setBuyNowItem,
+          clearBuyNowItem: this.clearBuyNowItem,
           mergeGuestCartIntoUser: this.mergeGuestCartIntoUser,
         }}
       >
