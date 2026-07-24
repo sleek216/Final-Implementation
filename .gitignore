@@ -40,8 +40,8 @@ recommendation/*.pyc
 recommendation/venv/
 recommendation/.venv/
 
-# Uploads
-server/uploads/
+# Uploads — tracked so product/brand images ship with the repo
+# (keep node_modules and .env ignored)
 
 # OS files
 .DS_Store
