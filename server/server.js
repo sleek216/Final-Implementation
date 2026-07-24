@@ -17,7 +17,7 @@ import settingRoutes from './routes/settingRoutes.js';
 import Category from './models/Category.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
