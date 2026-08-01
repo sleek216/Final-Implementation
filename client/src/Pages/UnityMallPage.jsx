@@ -1,45 +1,65 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../api";
 import Product3DModal from "../components/Product3DModal";
-import { UNITY_BUILD } from "../config";
 import "../styles/UnityMall.css";
 
-const loadScript = (src) =>
-  new Promise((resolve, reject) => {
-    if (document.querySelector(`script[data-unity-src="${src}"]`)) {
-      resolve();
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = src;
-    script.dataset.unitySrc = src;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`Failed to load ${src}`));
-    document.body.appendChild(script);
-  });
+const STORAGE_KEY = "fv_unity_server_url";
 
 export default function UnityMallPage() {
   const [searchParams] = useSearchParams();
   const spawnPoint = searchParams.get("spawn") || "entrance";
 
-  const canvasRef = useRef(null);
-  const unityInstanceRef = useRef(null);
+  const iframeRef = useRef(null);
 
-  const [phase, setPhase] = useState("loading");
-  const [loadProgress, setLoadProgress] = useState(0);
-  const [loadError, setLoadError] = useState("");
+  /* ── URL input state ── */
+  const [savedUrl, setSavedUrl] = useState(() => localStorage.getItem(STORAGE_KEY) || "");
+  const [urlInput, setUrlInput] = useState(savedUrl);
+  const [connected, setConnected] = useState(!!savedUrl);
+
+  /* ── Unity state ── */
+  const [unityReady, setUnityReady] = useState(false);
   const [product, setProduct] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(false);
 
+  /* ── Build the iframe src ── */
+  const iframeSrc = connected && savedUrl
+    ? `${savedUrl.replace(/\/+$/, "")}?spawn=${encodeURIComponent(spawnPoint)}`
+    : "";
+
+  /* ── Connect handler ── */
+  const handleConnect = (e) => {
+    e.preventDefault();
+    const url = urlInput.trim();
+    if (!url) {
+      toast.error("Please enter a URL");
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, url);
+    setSavedUrl(url);
+    setConnected(true);
+    setUnityReady(false);
+    toast.success("Connecting to Unity build...");
+  };
+
+  /* ── Disconnect / change URL ── */
+  const handleDisconnect = () => {
+    setConnected(false);
+    setUnityReady(false);
+    setModalOpen(false);
+    setProduct(null);
+  };
+
+  /* ── Close product modal ── */
   const closeModal = useCallback(() => {
     setModalOpen(false);
     setProduct(null);
     document.body.style.overflow = "";
   }, []);
 
+  /* ── Open product from Unity ── */
   const openProductFromUnity = useCallback(async (productCode) => {
     const code = String(productCode || "").trim();
     if (!code) return;
@@ -52,158 +72,123 @@ export default function UnityMallPage() {
       document.body.style.overflow = "hidden";
     } catch (err) {
       console.error("[UnityMall] Product fetch failed:", err);
-      toast.error(`Product not found: ${code}. DB mein productId match karo.`);
+      toast.error(`Product not found: ${code}. Check productId in database.`);
     } finally {
       setLoadingProduct(false);
     }
   }, []);
 
-  useLayoutEffect(() => {
+  /* ── Also register as window.openProduct for the jslib fallback ── */
+  useEffect(() => {
     window.openProduct = openProductFromUnity;
-    return () => {
-      delete window.openProduct;
-    };
+    return () => { delete window.openProduct; };
   }, [openProductFromUnity]);
 
+  /* ── Listen for postMessage from Unity iframe ── */
   useEffect(() => {
-    return () => {
-      document.body.style.overflow = "";
+    const handler = (event) => {
+      if (!event.data || typeof event.data !== "object") return;
+
+      if (event.data.type === "FV_OPEN_PRODUCT") {
+        openProductFromUnity(event.data.productCode);
+      }
+      if (event.data.type === "FV_UNITY_READY") {
+        setUnityReady(true);
+      }
     };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [openProductFromUnity]);
+
+  /* ── Cleanup body overflow on unmount ── */
+  useEffect(() => {
+    return () => { document.body.style.overflow = ""; };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
+  /* ══════════ RENDER ══════════ */
 
-    const bootUnity = async () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+  /* -- URL input screen -- */
+  if (!connected) {
+    return (
+      <div className="unity-mall-page">
+        <header className="unity-mall-header">
+          <Link to="/home" className="unity-mall-back">← Back to Store</Link>
+          <p className="unity-mall-title">FashionVerse Unity Mall</p>
+          <Link to="/3d-mall" className="unity-mall-alt">Three.js Mall →</Link>
+        </header>
 
-      try {
-        setPhase("loading");
-        setLoadError("");
-        setLoadProgress(0);
+        <div className="unity-mall-connect-screen">
+          <div className="unity-mall-connect-card">
+            <div className="unity-mall-connect-icon">🎮</div>
+            <h2 className="unity-mall-connect-heading">Connect Unity Build</h2>
+            <p className="unity-mall-connect-desc">
+              Enter the URL of your local Unity WebGL server.<br />
+              Run the build from Unity (Build & Run) and paste the URL here.
+            </p>
+            <form onSubmit={handleConnect} className="unity-mall-connect-form">
+              <input
+                type="url"
+                className="unity-mall-connect-input"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="http://localhost:51234"
+                autoFocus
+                required
+              />
+              <button type="submit" className="unity-mall-connect-btn">
+                ▶ Connect & Play
+              </button>
+            </form>
+            <p className="unity-mall-connect-hint">
+              Tip: The port changes each time Unity runs. Copy the full URL from your browser.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        await loadScript(UNITY_BUILD.loaderUrl);
-
-        if (cancelled || typeof window.createUnityInstance !== "function") {
-          throw new Error(
-            `Unity loader not found. Build files ko client/public/unity/Build/ mein rakho (${UNITY_BUILD.buildName}.*).`
-          );
-        }
-
-        const config = {
-          dataUrl: UNITY_BUILD.dataUrl,
-          frameworkUrl: UNITY_BUILD.frameworkUrl,
-          codeUrl: UNITY_BUILD.codeUrl,
-          streamingAssetsUrl: UNITY_BUILD.streamingAssetsUrl,
-          companyName: UNITY_BUILD.companyName,
-          productName: UNITY_BUILD.productName,
-          productVersion: UNITY_BUILD.productVersion,
-        };
-
-        const instance = await window.createUnityInstance(
-          canvas,
-          config,
-          (progress) => {
-            if (!cancelled) setLoadProgress(Math.round(progress * 100));
-          }
-        );
-
-        if (cancelled) {
-          instance?.Quit?.();
-          return;
-        }
-
-        unityInstanceRef.current = instance;
-        setPhase("ready");
-        setLoadProgress(100);
-
-        // Tell Unity to place player at mall entrance (Main-Gate)
-        try {
-          if (spawnPoint) {
-            instance.SendMessage("MallSpawnManager", "SpawnAt", spawnPoint);
-          }
-        } catch (e) {
-          console.warn("[UnityMall] Spawn message failed - add MallSpawnManager in Unity scene:", e);
-        }
-      } catch (error) {
-        console.error("[UnityMall] Load failed:", error);
-        if (!cancelled) {
-          setPhase("error");
-          setLoadError(
-            error.message ||
-              "Unity build load nahi hui. README dekho: client/public/unity/README.md"
-          );
-        }
-      }
-    };
-
-    bootUnity();
-
-    return () => {
-      cancelled = true;
-      if (unityInstanceRef.current?.Quit) {
-        unityInstanceRef.current.Quit();
-        unityInstanceRef.current = null;
-      }
-    };
-  }, [spawnPoint]);
-
+  /* -- Connected: show iframe -- */
   return (
     <div className={`unity-mall-page ${modalOpen ? "unity-mall-page--modal-open" : ""}`}>
       <header className="unity-mall-header">
-        <Link to="/home" className="unity-mall-back">
-          ← Back to Store
-        </Link>
+        <Link to="/home" className="unity-mall-back">← Back to Store</Link>
         <p className="unity-mall-title">FashionVerse Unity Mall</p>
-        <Link to="/3d-mall" className="unity-mall-alt">
-          Three.js Mall →
-        </Link>
+        <button
+          type="button"
+          className="unity-mall-alt unity-mall-change-url"
+          onClick={handleDisconnect}
+        >
+          Change URL
+        </button>
       </header>
 
       <div className="unity-mall-canvas-wrap">
-        <canvas
-          ref={canvasRef}
-          id="unity-canvas"
-          className="unity-mall-canvas"
-          tabIndex={-1}
+        <iframe
+          ref={iframeRef}
+          src={iframeSrc}
+          className="unity-mall-iframe"
+          title="FashionVerse Unity Mall"
+          allow="autoplay; fullscreen; pointer-lock; gamepad"
+          allowFullScreen
         />
 
-        {phase === "loading" && (
+        {!unityReady && (
           <div className="unity-mall-overlay">
             <p className="unity-mall-overlay__title">Loading Unity Mall...</p>
             <div className="unity-mall-progress">
-              <div className="unity-mall-progress__fill" style={{ width: `${loadProgress}%` }} />
+              <div className="unity-mall-progress__fill unity-mall-progress__fill--pulse" />
             </div>
-            <span>{loadProgress}%</span>
+            <p className="unity-mall-overlay__subtitle">
+              Connected to: <code>{savedUrl}</code>
+            </p>
           </div>
         )}
 
-        {phase === "error" && (
-          <div className="unity-mall-overlay unity-mall-overlay--error">
-            <h2>Unity Build Missing</h2>
-            <p>{loadError}</p>
-            <ol className="unity-mall-steps">
-              <li>Unity se WebGL build export karo</li>
-              <li>
-                <code>Build/</code> folder copy karo →{" "}
-                <code>client/public/unity/Build/</code>
-              </li>
-              <li>
-                <code>StreamingAssets/</code> (agar ho) →{" "}
-                <code>client/public/unity/StreamingAssets/</code>
-              </li>
-              <li>
-                Build name <code>{UNITY_BUILD.buildName}</code> hona chahiye ya{" "}
-                <code>.env</code> mein <code>VITE_UNITY_BUILD_NAME</code> set karo
-              </li>
-            </ol>
-          </div>
-        )}
-
-        {phase === "ready" && (
+        {unityReady && !modalOpen && (
           <div className="unity-mall-hud">
-            <span>Poster dekho → <kbd>F</kbd> press → 3D product modal</span>
+            <span>Walk to a poster → press <kbd>F</kbd> or <kbd>E</kbd> → view product</span>
           </div>
         )}
 

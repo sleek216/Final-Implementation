@@ -98,10 +98,6 @@ export default function UnityInMallOverlay({
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    if (!otpSent) {
-      setError("Send OTP first");
-      return;
-    }
     setLoading(true);
     try {
       await api.post("/auth/register", {
@@ -109,7 +105,6 @@ export default function UnityInMallOverlay({
         email: regEmail,
         phone: regPhone,
         password: regPassword,
-        otp: regOtp,
         role: "customer",
       });
       toast.success("Account created! Logging you in...");
@@ -144,7 +139,57 @@ export default function UnityInMallOverlay({
     onShippingComplete?.();
   };
 
-  const handlePayment = async () => {
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExp, setCardExp] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [completedOrder, setCompletedOrder] = useState(null);
+
+  const handleCardNumberChange = (e) => {
+    setError("");
+    let val = e.target.value.replace(/\D/g, "").slice(0, 16);
+    let formatted = val.replace(/(.{4})/g, "$1 ").trim();
+    setCardNumber(formatted);
+  };
+
+  const handleCardExpChange = (e) => {
+    setError("");
+    let val = e.target.value.replace(/\D/g, "").slice(0, 4);
+    if (val.length >= 3) {
+      val = val.slice(0, 2) + "/" + val.slice(2);
+    }
+    setCardExp(val);
+  };
+
+  const handleCardCvcChange = (e) => {
+    setError("");
+    let val = e.target.value.replace(/\D/g, "").slice(0, 4);
+    setCardCvc(val);
+  };
+
+  const validateCardDetails = () => {
+    const rawCard = cardNumber.replace(/\s/g, "");
+    if (rawCard.length < 15) {
+      return "Card number must be 16 digits (e.g. 4242 4242 4242 4242)";
+    }
+    if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(cardExp)) {
+      return "Expiry must be in MM/YY format (e.g. 12/28)";
+    }
+    const parts = cardExp.split("/");
+    const expMonth = parseInt(parts[0], 10);
+    const expYear = 2000 + parseInt(parts[1], 10);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+      return "Card expiry date is in the past";
+    }
+    if (cardCvc.length < 3) {
+      return "CVC must be 3 or 4 digits (e.g. 123)";
+    }
+    return null;
+  };
+
+  const handleStripeSession = async () => {
     const shippingAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
     if (!shippingAddress.address) {
       setError("Add shipping address first");
@@ -161,20 +206,110 @@ export default function UnityInMallOverlay({
       );
       if (res.data.url) {
         window.open(res.data.url, "_blank", "noopener,noreferrer");
-        toast.info("Complete payment in the Stripe tab. Unity mall stays open here.");
+        toast.info("Stripe Hosted Checkout opened in new tab. Your 3D Mall stays live!");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Payment could not start");
+      setError(err.response?.data?.message || "Stripe Session Error");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDirectPayment = async (e) => {
+    e?.preventDefault();
+    const shippingAddress = JSON.parse(localStorage.getItem("shippingAddress") || "{}");
+    if (!shippingAddress.address) {
+      setError("Add shipping address first");
+      return;
+    }
+
+    const validationError = validateCardDetails();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Format items so productId is guaranteed to be MongoDB ObjectId
+      const formattedItems = checkoutItems.map((item) => ({
+        productId: item._id || item.id,
+        quantity: item.qty || item.quantity || 1,
+        price: typeof item.price === "string" ? parseFloat(item.price.replace(/[Rs. ,]/g, "")) : item.price,
+      }));
+
+      const res = await api.post(
+        "/orders",
+        {
+          items: formattedItems,
+          totalAmount: subtotal,
+          shippingAddress,
+          paymentMethod: "credit_card",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      localStorage.removeItem("buyNowItem");
+      toast.success("Payment Successful! Order placed in 3D Mall.");
+      setCompletedOrder(res.data.order || { _id: "ORD-" + Date.now(), totalAmount: subtotal });
+    } catch (err) {
+      setError(err.response?.data?.message || "Payment processing failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (completedOrder) {
+    return (
+      <div className="unity-inmall-stack" onClick={(e) => e.stopPropagation()}>
+        <div className="unity-inmall-card">
+          <div className="unity-inmall-card-header">
+            <span>🎉 Order Confirmed!</span>
+            <button type="button" className="unity-inmall-close" onClick={onClose} aria-label="Close">
+              X
+            </button>
+          </div>
+          <div className="unity-inmall-card-body" style={{ textAlign: "center", padding: "20px 16px" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🛍️</div>
+            <h3 style={{ margin: "0 0 6px", fontSize: "1.1rem", color: "#fff" }}>Thank You for Your Order!</h3>
+            <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.75)", margin: "0 0 12px" }}>
+              Order ID: <code style={{ color: "#38bdf8" }}>{completedOrder._id}</code>
+            </p>
+            <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "10px", padding: "10px", margin: "12px 0", textAlign: "left" }}>
+              <p style={{ fontSize: "0.8rem", margin: "0 0 6px", fontWeight: "bold", color: "#fff" }}>Order Summary:</p>
+              {checkoutItems.map((item) => (
+                <p key={item.id || item._id} style={{ fontSize: "0.78rem", margin: "3px 0", color: "rgba(255,255,255,0.8)" }}>
+                  • {item.name} (x{item.qty || item.quantity || 1})
+                </p>
+              ))}
+              <hr style={{ borderColor: "rgba(255,255,255,0.15)", margin: "8px 0" }} />
+              <p style={{ fontSize: "0.88rem", fontWeight: "bold", margin: 0, color: "#4ade80" }}>
+                Total Paid: Rs. {subtotal.toLocaleString()}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="unity-inmall-btn-primary"
+              onClick={onClose}
+              style={{ marginTop: "10px" }}
+            >
+              🎮 Continue Shopping in 3D Mall
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const title =
     flow === "shipping"
       ? "Shipping"
       : flow === "payment"
-        ? "Payment"
+        ? "Stripe Card Payment"
         : mode === "register"
           ? "Register"
           : "Login";
@@ -232,12 +367,6 @@ export default function UnityInMallOverlay({
               <input className="unity-inmall-input" value={regPhone} onChange={(e) => setRegPhone(e.target.value)} placeholder="03XXXXXXXXX" required />
               <label className="unity-inmall-label">Password</label>
               <input className="unity-inmall-input" type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
-              <div className="unity-inmall-otp-row">
-                <input className="unity-inmall-input" value={regOtp} onChange={(e) => setRegOtp(e.target.value)} placeholder="6-digit OTP" maxLength={6} />
-                <button type="button" className="unity-inmall-btn-ghost" onClick={handleSendOtp} disabled={loading}>
-                  Send OTP
-                </button>
-              </div>
               {error && <p className="unity-inmall-error">{error}</p>}
               <button type="submit" className="unity-inmall-btn-primary" disabled={loading}>
                 {loading ? "..." : "Create account"}
@@ -273,17 +402,74 @@ export default function UnityInMallOverlay({
 
           {flow === "payment" && (
             <div>
-              <p className="unity-inmall-summary">Total: Rs. {subtotal.toLocaleString()}</p>
-              {checkoutItems.map((item) => (
-                <p key={item.id || item._id} className="unity-inmall-line">
-                  {item.name} x{item.qty || item.quantity || 1}
-                </p>
-              ))}
-              <p className="unity-inmall-hint">Stripe opens in a new tab. Mall stays here.</p>
-              {error && <p className="unity-inmall-error">{error}</p>}
-              <button type="button" className="unity-inmall-btn-primary" onClick={handlePayment} disabled={loading}>
-                {loading ? "..." : `Pay Rs. ${subtotal.toLocaleString()}`}
+              <p className="unity-inmall-summary">Total Payable: Rs. {subtotal.toLocaleString()}</p>
+              <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "8px", padding: "8px 10px", marginBottom: "12px" }}>
+                {checkoutItems.map((item) => (
+                  <p key={item.id || item._id} className="unity-inmall-line" style={{ margin: "2px 0", fontSize: "11px" }}>
+                    • {item.name} x{item.qty || item.quantity || 1}
+                  </p>
+                ))}
+              </div>
+
+              {/* Stripe Session Button */}
+              <button
+                type="button"
+                className="unity-inmall-btn-primary"
+                onClick={handleStripeSession}
+                disabled={loading}
+                style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", marginBottom: "14px" }}
+              >
+                {loading ? "Redirecting..." : `💳 Stripe Hosted Checkout (Opens in Tab)`}
               </button>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "10px 0", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.15)" }} />
+                <span>OR PAY DIRECTLY IN 3D MALL</span>
+                <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.15)" }} />
+              </div>
+
+              <form onSubmit={handleDirectPayment}>
+                <label className="unity-inmall-label">Card Number (16 Digits)</label>
+                <input
+                  className="unity-inmall-input"
+                  placeholder="4242 4242 4242 4242"
+                  value={cardNumber}
+                  onChange={handleCardNumberChange}
+                  maxLength={19}
+                  required
+                />
+
+                <div className="unity-inmall-row">
+                  <div>
+                    <label className="unity-inmall-label">Expiry (MM/YY)</label>
+                    <input
+                      className="unity-inmall-input"
+                      placeholder="12/28"
+                      value={cardExp}
+                      onChange={handleCardExpChange}
+                      maxLength={5}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="unity-inmall-label">CVC (3-4 Digits)</label>
+                    <input
+                      className="unity-inmall-input"
+                      type="password"
+                      placeholder="123"
+                      value={cardCvc}
+                      onChange={handleCardCvcChange}
+                      maxLength={4}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {error && <p className="unity-inmall-error">{error}</p>}
+                <button type="submit" className="unity-inmall-btn-primary" disabled={loading} style={{ marginTop: "12px" }}>
+                  {loading ? "Processing Order..." : `🔒 Instant Pay Rs. ${subtotal.toLocaleString()}`}
+                </button>
+              </form>
             </div>
           )}
         </div>

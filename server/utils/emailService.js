@@ -1,25 +1,36 @@
 import nodemailer from 'nodemailer';
 import Otp from '../models/Otp.js';
+import Setting from '../models/Setting.js';
 
-// Create transporter - only if credentials are configured
-let transporter = null;
 
-const initTransporter = () => {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.SMTP_HOST) {
-    console.warn('Email not configured. Check .env');
+let cachedEmailFrom = null;
+
+const initTransporter = async () => {
+  let settings = null;
+  try {
+    settings = await Setting.findOne();
+  } catch (err) {
+    console.error("Error fetching settings for email", err);
+  }
+
+  const host = settings?.smtpHost || process.env.SMTP_HOST;
+  const port = settings?.smtpPort || process.env.SMTP_PORT;
+  const secure = settings?.smtpSecure ?? (process.env.SMTP_SECURE === 'true');
+  const user = settings?.smtpUser || process.env.SMTP_USER;
+  const pass = settings?.smtpPass || process.env.SMTP_PASS;
+  
+  cachedEmailFrom = settings?.emailFrom || process.env.EMAIL_FROM || `"FashionVerse" <${user}>`;
+
+  if (!user || !pass || !host) {
+    console.warn('Email not configured. Check Admin Settings or .env');
     return null;
   }
 
-  console.log('Initializing Transporter for:', process.env.SMTP_USER);
-
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
+    host,
+    port: parseInt(port) || 587,
+    secure, 
+    auth: { user, pass }
   });
 };
 
@@ -30,22 +41,18 @@ const initTransporter = () => {
  */
 export const sendOtpEmail = async (to, otp) => {
   try {
-
-    if (!transporter) {
-      transporter = initTransporter();
-    }
-
+    const transporter = await initTransporter();
 
     if (!transporter) {
       console.log('======================================');
       console.log(`📧 OTP for ${to}: ${otp}`);
       console.log('======================================');
-      console.log('(Email not sent - configure SMTP settings in .env)');
+      console.log('(Email not sent - configure SMTP settings in Admin Panel)');
       return;
     }
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: 'Password Reset OTP - FashionVerse',
       html: `
@@ -92,7 +99,7 @@ export const sendOtpEmail = async (to, otp) => {
  */
 export const sendRegistrationOtpEmail = async (to, otp) => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
 
     if (!transporter) {
       console.log('======================================');
@@ -102,7 +109,7 @@ export const sendRegistrationOtpEmail = async (to, otp) => {
     }
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: 'Verify Your Email - FashionVerse Registration',
       html: `
@@ -147,11 +154,11 @@ export const sendRegistrationOtpEmail = async (to, otp) => {
  */
 export const sendBrandRegistrationEmail = async (to, brandName) => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
     if (!transporter) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: 'Brand Registration Received - FashionVerse',
       html: `
@@ -194,11 +201,11 @@ export const sendBrandRegistrationEmail = async (to, brandName) => {
  */
 export const sendBrandApprovalEmail = async (to, brandName, password) => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
     if (!transporter) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: 'Welcome to FashionVerse - Brand Approved!',
       html: `
@@ -248,11 +255,11 @@ export const sendBrandApprovalEmail = async (to, brandName, password) => {
  */
 export const sendBrandRejectionEmail = async (to, brandName, reason) => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
     if (!transporter) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: 'Brand Registration Status - FashionVerse',
       html: `
@@ -295,7 +302,7 @@ export const sendBrandRejectionEmail = async (to, brandName, reason) => {
  */
 export const sendOrderConfirmationEmail = async (to, order) => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
     if (!transporter) return;
 
     const itemsHtml = order.items.map(item => `
@@ -311,7 +318,7 @@ export const sendOrderConfirmationEmail = async (to, order) => {
     `).join('');
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject: `Order Confirmed! #${order._id.toString().slice(-6).toUpperCase()}`,
       html: `
@@ -389,7 +396,7 @@ export const sendOrderConfirmationEmail = async (to, order) => {
  */
 export const sendNewOrderNotification = async (to, order, role = 'admin') => {
   try {
-    if (!transporter) transporter = initTransporter();
+    const transporter = await initTransporter();
     if (!transporter) return;
 
     const subject = role === 'admin'
@@ -409,7 +416,7 @@ export const sendNewOrderNotification = async (to, order, role = 'admin') => {
     `).join('');
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"FashionVerse" <${process.env.SMTP_USER}>`,
+      from: cachedEmailFrom,
       to,
       subject,
       html: `
@@ -460,5 +467,4 @@ export const sendNewOrderNotification = async (to, order, role = 'admin') => {
     console.error(`❌ Notification failed for ${role}:`, error.message);
   }
 };
-
-export default transporter;
+export default { sendOtpEmail, sendRegistrationOtpEmail, sendBrandRegistrationEmail, sendBrandApprovalEmail, sendBrandRejectionEmail, sendOrderConfirmationEmail, sendNewOrderNotification };

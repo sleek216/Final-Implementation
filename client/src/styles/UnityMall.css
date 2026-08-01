@@ -1,3 +1,5 @@
+/* ═══════ Unity Mall – iframe-based layout ═══════ */
+
 .unity-mall-page {
   position: relative;
   width: 100%;
@@ -12,6 +14,7 @@
   pointer-events: none;
 }
 
+/* ── Header bar ── */
 .unity-mall-header {
   display: flex;
   align-items: center;
@@ -30,11 +33,25 @@
   text-decoration: none;
   font-size: 0.875rem;
   white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .unity-mall-back:hover,
 .unity-mall-alt:hover {
   color: #f8fafc;
+}
+
+.unity-mall-change-url {
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.unity-mall-change-url:hover {
+  background: rgba(148, 163, 184, 0.15) !important;
 }
 
 .unity-mall-title {
@@ -45,19 +62,22 @@
   letter-spacing: 0.04em;
 }
 
+/* ── iframe wrapper ── */
 .unity-mall-canvas-wrap {
   position: relative;
   flex: 1;
   min-height: 0;
 }
 
-.unity-mall-canvas {
+.unity-mall-iframe {
   width: 100%;
   height: 100%;
+  border: 0;
   display: block;
   background: #111827;
 }
 
+/* ── Loading overlay ── */
 .unity-mall-overlay {
   position: absolute;
   inset: 0;
@@ -66,21 +86,31 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: rgba(15, 23, 42, 0.88);
+  background: rgba(15, 23, 42, 0.92);
   color: #e2e8f0;
   padding: 2rem;
   text-align: center;
   z-index: 5;
 }
 
-.unity-mall-overlay--error {
-  overflow-y: auto;
-}
-
 .unity-mall-overlay__title {
   margin: 0;
   font-weight: 600;
+  font-size: 1.1rem;
   letter-spacing: 0.06em;
+}
+
+.unity-mall-overlay__subtitle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.unity-mall-overlay__subtitle code {
+  background: #1e293b;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
 }
 
 .unity-mall-progress {
@@ -97,21 +127,18 @@
   transition: width 0.2s ease;
 }
 
-.unity-mall-steps {
-  text-align: left;
-  max-width: 520px;
-  margin: 1rem auto 0;
-  line-height: 1.6;
-  color: #cbd5e1;
+.unity-mall-progress__fill--pulse {
+  width: 100%;
+  animation: unity-pulse 1.5s ease-in-out infinite;
 }
 
-.unity-mall-steps code {
-  background: #1e293b;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  font-size: 0.85em;
+@keyframes unity-pulse {
+  0%   { opacity: 0.3; transform: scaleX(0.3); transform-origin: left; }
+  50%  { opacity: 1;   transform: scaleX(1);   transform-origin: left; }
+  100% { opacity: 0.3; transform: scaleX(0.3); transform-origin: right; }
 }
 
+/* ── HUD / controls hint ── */
 .unity-mall-hud {
   position: absolute;
   left: 50%;
@@ -134,6 +161,7 @@
   font-size: 0.75rem;
 }
 
+/* ── Product loading badge ── */
 .unity-mall-fetching {
   position: absolute;
   top: 1rem;
@@ -144,8 +172,120 @@
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
   font-size: 0.8rem;
+  animation: fadeIn 0.2s ease;
 }
 
+/* ── Product modal z-index ── */
 .unity-mall-page .product-3d-overlay {
   z-index: 10000;
+}
+
+/* ═══════ Connect screen (URL input) ═══════ */
+
+.unity-mall-connect-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(ellipse at 50% 40%, rgba(14, 165, 233, 0.08), transparent 70%);
+}
+
+.unity-mall-connect-card {
+  width: min(480px, 100%);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+}
+
+.unity-mall-connect-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 2px 6px rgba(14, 165, 233, 0.3));
+}
+
+.unity-mall-connect-heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.02em;
+}
+
+.unity-mall-connect-desc {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.unity-mall-connect-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.unity-mall-connect-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.unity-mall-connect-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.unity-mall-connect-input::placeholder {
+  color: #64748b;
+}
+
+.unity-mall-connect-btn {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
+}
+
+.unity-mall-connect-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+}
+
+.unity-mall-connect-btn:active {
+  transform: translateY(0);
+}
+
+.unity-mall-connect-hint {
+  margin: 1.25rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

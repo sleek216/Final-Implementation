@@ -9,6 +9,14 @@ class AdminSettings extends Component {
         stripeSecretKey: "",
         stripePublishableKey: "",
         siteName: "FashionVerse",
+        
+        // Email Settings
+        smtpHost: "",
+        smtpPort: "",
+        smtpSecure: false,
+        smtpUser: "",
+        smtpPass: "",
+        emailFrom: "",
 
         // Admin Profile
         adminName: "",
@@ -43,13 +51,19 @@ class AdminSettings extends Component {
                 api.get("/auth/profile")
             ]);
 
-            const { stripeSecretKey, stripePublishableKey, siteName } = settingsRes.data;
+            const { stripeSecretKey, stripePublishableKey, siteName, smtpHost, smtpPort, smtpSecure, smtpUser, smtpPass, emailFrom } = settingsRes.data;
             const { name, email, image } = profileRes.data;
 
             this.setState({
                 stripeSecretKey: stripeSecretKey || "",
                 stripePublishableKey: stripePublishableKey || "",
                 siteName: siteName || "FashionVerse",
+                smtpHost: smtpHost || "",
+                smtpPort: smtpPort || "",
+                smtpSecure: smtpSecure || false,
+                smtpUser: smtpUser || "",
+                smtpPass: smtpPass || "",
+                emailFrom: emailFrom || "",
                 adminName: name || "",
                 adminEmail: email || "",
                 adminImage: image || "",
@@ -80,11 +94,17 @@ class AdminSettings extends Component {
         this.setState({ saving: true, message: "", error: "" });
 
         try {
-            const { stripeSecretKey, stripePublishableKey, siteName } = this.state;
+            const { stripeSecretKey, stripePublishableKey, siteName, smtpHost, smtpPort, smtpSecure, smtpUser, smtpPass, emailFrom } = this.state;
             await api.put("/settings", {
                 stripeSecretKey,
                 stripePublishableKey,
                 siteName,
+                smtpHost,
+                smtpPort,
+                smtpSecure,
+                smtpUser,
+                smtpPass,
+                emailFrom,
             });
             this.setState({ saving: false, message: "System settings saved successfully!" });
         } catch (err) {
@@ -167,6 +187,12 @@ class AdminSettings extends Component {
             stripeSecretKey,
             stripePublishableKey,
             siteName,
+            smtpHost,
+            smtpPort,
+            smtpSecure,
+            smtpUser,
+            smtpPass,
+            emailFrom,
             adminName,
             adminEmail,
             adminImage,
@@ -282,6 +308,77 @@ class AdminSettings extends Component {
                                                             {showSecret ? "Hide" : "Show"}
                                                         </button>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="premium-section">
+                                                <div className="section-header">
+                                                    <h3>Email Configuration (SMTP)</h3>
+                                                    <p>Settings for system emails (OTP, order confirmation).</p>
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label>SMTP Host</label>
+                                                    <input
+                                                        type="text"
+                                                        name="smtpHost"
+                                                        value={smtpHost}
+                                                        onChange={this.handleChange}
+                                                        placeholder="smtp.example.com"
+                                                    />
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label>SMTP Port</label>
+                                                    <input
+                                                        type="text"
+                                                        name="smtpPort"
+                                                        value={smtpPort}
+                                                        onChange={this.handleChange}
+                                                        placeholder="587"
+                                                    />
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="smtpSecure"
+                                                            checked={smtpSecure}
+                                                            onChange={(e) => this.setState({ smtpSecure: e.target.checked })}
+                                                            style={{ width: 'auto' }}
+                                                        />
+                                                        Use Secure Connection (TLS/SSL)
+                                                    </label>
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label>SMTP Username</label>
+                                                    <input
+                                                        type="text"
+                                                        name="smtpUser"
+                                                        value={smtpUser}
+                                                        onChange={this.handleChange}
+                                                        placeholder="user@example.com"
+                                                    />
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label>SMTP Password</label>
+                                                    <div className="password-wrapper-premium">
+                                                        <input
+                                                            type={showSecret ? "text" : "password"}
+                                                            name="smtpPass"
+                                                            value={smtpPass}
+                                                            onChange={this.handleChange}
+                                                            placeholder="password or app password"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="premium-field">
+                                                    <label>Sender Email (From)</label>
+                                                    <input
+                                                        type="text"
+                                                        name="emailFrom"
+                                                        value={emailFrom}
+                                                        onChange={this.handleChange}
+                                                        placeholder='"FashionVerse" <no-reply@fashionverse.com>'
+                                                    />
                                                 </div>
                                             </div>
 

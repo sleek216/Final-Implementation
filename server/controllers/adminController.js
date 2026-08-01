@@ -4,6 +4,7 @@ import Product from "../models/Product.js";
 import Order from "../models/Order.js";
 import Category from "../models/Category.js";
 import Color from "../models/Color.js";
+import Setting from "../models/Setting.js";
 import { sendBrandApprovalEmail, sendBrandRejectionEmail } from "../utils/emailService.js";
 import multer from "multer";
 import path from "path";
@@ -208,16 +209,11 @@ export const getAdminStats = async (req, res) => {
 // GET SETTINGS
 export const getSettings = async (req, res) => {
   try {
-    // For now, return default settings. Later, can use a Settings model.
-    const settings = {
-      storeProfile: {
-        storeName: "FashionVerse",
-        supportEmail: "support@fashionverse.com"
-      },
-      securitySettings: {
-        twoFactorAuth: false
-      }
-    };
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = new Setting();
+      await settings.save();
+    }
     res.json(settings);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -227,9 +223,17 @@ export const getSettings = async (req, res) => {
 // UPDATE SETTINGS
 export const updateSettings = async (req, res) => {
   try {
-    const { storeProfile, securitySettings } = req.body;
-    // For now, just return success. In real app, save to DB.
-    res.json({ message: "Settings updated successfully" });
+    const updateData = req.body;
+    let settings = await Setting.findOne();
+    
+    if (!settings) {
+      settings = new Setting(updateData);
+    } else {
+      Object.assign(settings, updateData);
+    }
+    
+    await settings.save();
+    res.json({ message: "Settings updated successfully", settings });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

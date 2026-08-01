@@ -14,23 +14,60 @@ export const createOrder = async (req, res) => {
   try {
     const { items, totalAmount, shippingAddress, paymentMethod } = req.body;
 
-    const normalizedItems = items.map(item => ({
-      productId: item.productId || item.id || item._id,
-      quantity: item.quantity || item.qty || 1,
-      price: typeof item.price === 'string' ? parseFloat(item.price.replace(/[Rs. ,]/g, "")) : item.price
-    }));
+    const normalizedItems = [];
+    for (const item of items) {
+      let rawId = item._id || item.id;
+      let targetProduct = null;
+
+      // 1. Try lookup by mongo _id / id
+      if (rawId && mongoose.Types.ObjectId.isValid(rawId)) {
+        targetProduct = await Product.findById(rawId);
+      }
+
+      // 2. Try lookup by productId string code (e.g. MEN-GREEN-001)
+      if (!targetProduct && item.productId) {
+        if (mongoose.Types.ObjectId.isValid(item.productId)) {
+          targetProduct = await Product.findById(item.productId);
+        } else {
+          targetProduct = await Product.findOne({ productId: item.productId });
+        }
+      }
+
+      const finalMongoId = targetProduct ? targetProduct._id : (mongoose.Types.ObjectId.isValid(rawId) ? rawId : null);
+
+      if (!finalMongoId) {
+        return res.status(400).json({ message: `Invalid product ID for ${item.name || item.productId || "item"}` });
+      }
+
+      const priceVal = typeof item.price === 'string'
+        ? parseFloat(item.price.replace(/[Rs. ,]/g, ""))
+        : (item.price || (targetProduct ? targetProduct.price : 0));
+
+      normalizedItems.push({
+        productId: finalMongoId,
+        quantity: item.quantity || item.qty || 1,
+        price: priceVal || 0
+      });
+    }
+
+    const safePaymentMethod = ['credit_card', 'debit_card', 'stripe_card', 'card', 'cash_on_delivery', 'upi', 'net_banking'].includes(paymentMethod)
+      ? paymentMethod
+      : 'credit_card';
 
     const order = new Order({
       userId: req.user._id,
       items: normalizedItems,
-      totalAmount,
+      totalAmount: totalAmount || normalizedItems.reduce((sum, i) => sum + (i.price * i.quantity), 0),
       shippingAddress,
-      paymentMethod,
+      paymentMethod: safePaymentMethod,
+      paymentStatus: 'completed',
+      orderStatus: 'processing',
     });
 
     await order.save();
     res.status(201).json({ message: 'Order created successfully', order });
   } catch (error) {
+    console.error("createOrder Error:", error);
     res.status(500).json({ message: error.message });
   }
 };

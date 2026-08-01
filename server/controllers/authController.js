@@ -119,15 +119,18 @@ export const registerUser = async (req, res) => {
     const { name, email, phone, password, role, username, otp } = req.body;
     const normalizedEmail = email ? email.toLowerCase().trim() : "";
 
-    // 1. Verify OTP
-    const otpRecord = await Otp.findOne({
-      email: normalizedEmail,
-      otp: otp,
-      purpose: "registration"
-    });
+    // 1. Verify OTP (if provided)
+    if (otp) {
+      const otpRecord = await Otp.findOne({
+        email: normalizedEmail,
+        otp: otp,
+        purpose: "registration"
+      });
 
-    if (!otpRecord) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+      if (!otpRecord) {
+        return res.status(400).json({ message: "Invalid or expired OTP" });
+      }
+      await Otp.deleteOne({ _id: otpRecord._id });
     }
 
     // 2. Check user exists
@@ -152,9 +155,6 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
       role: role || "customer"
     });
-
-    // 6. Delete OTP record
-    await Otp.deleteOne({ _id: otpRecord._id });
 
     res.status(201).json({
       message: "Registration successful!",

@@ -1,0 +1,4 @@
+repository "FYP-Stores/FYP-Stores@18968357598106@cloud"
+  path "/"
+    br "/main"
+    co "/main"

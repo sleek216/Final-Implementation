@@ -13,6 +13,12 @@ const settingSchema = new mongoose.Schema({
         type: String,
         default: 'FashionVerse',
     },
+    smtpHost: { type: String, default: '' },
+    smtpPort: { type: String, default: '' },
+    smtpSecure: { type: Boolean, default: false },
+    smtpUser: { type: String, default: '' },
+    smtpPass: { type: String, default: '' },
+    emailFrom: { type: String, default: '' },
 }, { timestamps: true });
 
 const Setting = mongoose.model('Setting', settingSchema);
